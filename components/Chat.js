@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet  } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView  } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat'
 
 export default class Chat extends React.Component {
@@ -45,19 +45,27 @@ export default class Chat extends React.Component {
         }); */
 
         return (
-            <GiftedChat
-                messages={this.state.messages}
-                onSend={messages => this.onSend(messages)}
-                user={{
-                    _id: 1,
-                }}
-            />
+            <View style={styles.mainContainer}>
+                <GiftedChat
+                    messages={this.state.messages}
+                    onSend={messages => this.onSend(messages)}
+                    user={{
+                        _id: 1,
+                    }}
+                />
+                {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
+                // prevent the keyboard hiding the text input on older android devices
+                }
+            </View>
         );
     };
 }
 
-/* const styles = StyleSheet.create({
-    background: {
+const styles = StyleSheet.create({
+    /* background: {
         backgroundColor: color,
+    } */
+    mainContainer: {
+        flex: 1,
     }
-}) */
+})
