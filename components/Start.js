@@ -9,10 +9,6 @@ export default class Start extends Component {
         this.state = { name: '', color: '' };
     }
 
-/*     renderColorElement = () => {
-        colors.map((color) => <View style={[styles.color, styles.{color}}]}></View>)
-    } */
-
     render() {
         return (
             <View style={styles.main}>
