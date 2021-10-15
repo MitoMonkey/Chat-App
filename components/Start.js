@@ -29,7 +29,11 @@ export default class Start extends Component {
                                 {colors.map((col) => <Pressable 
                                     style={[styles.color, {backgroundColor: {col}}, styles[col], this.state.color === col ? styles.border : styles.noBorder]}
                                     key={col}
-                                    onPress={() => { this.setState({ color: col }) }}>
+                                    onPress={() => { this.setState({ color: col }) }}
+                                    accessible={true}
+                                    accessibilityLabel={col}
+                                    accessibilityHint="Choose your background color."
+                                    accessibilityRole="button">
                                     </Pressable>
                                 ) }                                
                             </View>
@@ -37,6 +41,10 @@ export default class Start extends Component {
                         <Button
                             title="Start chatting"
                             style={styles.button}
+                            accessible={true}
+                            accessibilityLabel="Start chatting"
+                            accessibilityHint="Navigate to the Chat screen."
+                            accessibilityRole="button"
                             onPress={() => this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color })}
                         />
                     </View>
