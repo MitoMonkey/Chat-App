@@ -19,6 +19,12 @@ export default class ChatApp extends Component {
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Start"
+          screenOptions={{
+            headerTitleAlign: 'center',
+            headerStyle: {
+              backgroundColor: 'orange',
+            },
+          }}
         >
           <Stack.Screen
             name="Start"
