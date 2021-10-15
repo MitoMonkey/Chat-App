@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         color: "black",
         padding: 1,
+        paddingHorizontal: 2,
     },
     colorContainer: {
         flexDirection: 'column',

@@ -8,7 +8,7 @@ export default class Chat extends React.Component {
         this.state = {
             messages: [],
             user: '',
-            bgColor: ''
+            background: ''
         }
     }
     
@@ -28,12 +28,19 @@ export default class Chat extends React.Component {
                 },
                 {
                     _id: 2,
-                    text: 'This is a system message',
+                    text: `Welcome to the chat ${this.props.route.params.name}.`,
                     createdAt: new Date(),
                     system: true,
                 },
             ],
-        })
+            user: this.props.route.params.name,
+            background: this.props.route.params.color,
+        });
+        
+        // load the state of "name" in App.js as a prop into Chat component
+        let { name, color } = this.props.route.params;
+        // adjust the navigation bar
+        this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: color } });
     }
 
     onSend(messages = []) {
@@ -57,14 +64,7 @@ export default class Chat extends React.Component {
     }
 
     render() {
-        // load the state of "name" in App.js as a prop into Chat component
-        let { name, color } = this.props.route.params;
-
-        // Show the name in the navigation bar
-        this.props.navigation.setOptions({ title: name });
-        /* React.useLayoutEffect(() => { // for a functional component
-            navigation.setOptions({ title: name });
-        }); */
+        
 
         return (
             <View style={styles.mainContainer}>
