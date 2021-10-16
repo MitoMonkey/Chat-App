@@ -43,7 +43,7 @@ export default class Chat extends React.Component {
     
     componentDidMount() {
         // initialize with a mock message and a system message
-        this.setState({
+        /* this.setState({
             messages: [
                 {
                     _id: 1,
@@ -62,9 +62,9 @@ export default class Chat extends React.Component {
                     system: true,
                 },
             ],
-/*             user: this.props.route.params.name,
-            background: this.props.route.params.color, */
-        });
+            user: this.props.route.params.name,
+            background: this.props.route.params.color,
+        }); */
         
         // load the state of "name" and "color" from App.js as a prop into Chat component
         // let { name, color } = this.props.route.params;
@@ -73,7 +73,10 @@ export default class Chat extends React.Component {
 
         //if (this.referenceChatMessages.length != 0) {
             // “listen” for updates in the Firestore collection
-            this.unsubscribe = this.referenceChatMessages.onSnapshot(this.onCollectionUpdate);
+            //this.unsubscribe = this.referenceChatMessages.onSnapshot(this.onCollectionUpdate);
+            this.unsubscribe = this.referenceChatMessages
+                .orderBy("createdAt", "desc")
+                .onSnapshot(this.onCollectionUpdate);
         // }
         // else { this.alertMyText('No messages found in database'); }
 
@@ -89,7 +92,17 @@ export default class Chat extends React.Component {
             //update user state with currently active user data
             this.setState({
                 uid: user.uid,
-                loggedInText: 'Hello there',
+                loggedInText: 'Hello ' + user,
+                messages: [],
+            });
+
+            // send a welcome message to the user after login
+                // this.onSend(this.state.loggedInText);
+            this.referenceChatMessages.add({
+                _id: 1,
+                text: `Welcome to the chat ${user}.`,
+                createdAt: new Date(),
+                system: true,
             });
         });
     }
@@ -114,6 +127,9 @@ export default class Chat extends React.Component {
         });
     } */
     onSend(messages = []) {
+        // add the user id to the new message
+        messages = messages.append(`uid: ${this.state.uid}`);
+
         // append the new message(s) to the state
         this.setState(previousState => ({
             messages: GiftedChat.append(previousState.messages, messages),
