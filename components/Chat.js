@@ -37,10 +37,11 @@ export default class Chat extends React.Component {
             background: this.props.route.params.color, */
         });
         
-        // load the state of "name" in App.js as a prop into Chat component
-        let { name, color } = this.props.route.params;
-        // adjust the navigation bar
-        this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: color } });
+        // load the state of "name" and "color" from App.js as a prop into Chat component
+        // let { name, color } = this.props.route.params;
+
+        // adjust the navigation bar (moved to App.js)
+        // this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: color } });
     }
 
     onSend(messages = []) {
