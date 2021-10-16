@@ -56,7 +56,7 @@ export default class Chat extends React.Component {
                 {...props}
                 wrapperStyle={{
                     right: { // modify the speach bubbles on the right side
-                        backgroundColor: '#000'
+                        backgroundColor: this.props.route.params.color
                     }
                 }}
             />

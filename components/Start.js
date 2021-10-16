@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, Button, TextInput, StyleSheet, ImageBackground, Pressable } from 'react-native';
 
-const colors = ['gray', 'teal', 'orange', 'cyan'];
+const colors = ['gray', 'teal', 'orange', 'blue'];
 
 export default class Start extends Component {
     constructor(props) {

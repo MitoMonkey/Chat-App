@@ -21,8 +21,9 @@ export default class ChatApp extends Component {
           initialRouteName="Start"
           screenOptions={{
             headerTitleAlign: 'center',
+            headerTintColor: 'white',
             headerStyle: {
-              backgroundColor: 'orange',
+              backgroundColor: 'orange'
             },
           }}
         >
