@@ -27,7 +27,7 @@ export default class Start extends Component {
                             <Text style={styles.text}>Choose your background color</Text>
                             <View style={styles.colorPicker}>
                                 {colors.map((col) => <Pressable 
-                                    style={[styles.color, {backgroundColor: {col}}, styles[col], this.state.color === col ? styles.border : styles.noBorder]}
+                                    style={[styles.color, {backgroundColor: col }, this.state.color === col ? styles.border : styles.noBorder]}
                                     key={col}
                                     onPress={() => { this.setState({ color: col }) }}
                                     accessible={true}
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     noBorder: {
         borderWidth: 0
     },
-    gray: {
+/*     gray: {
         backgroundColor: 'gray'
     },
     teal: {
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'cyan',
         borderColor: 'black',
         borderWidth: 1,
-    },
+    }, */
     button: {
         flex: 1,
         width: '80%',

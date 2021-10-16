@@ -33,8 +33,8 @@ export default class Chat extends React.Component {
                     system: true,
                 },
             ],
-            user: this.props.route.params.name,
-            background: this.props.route.params.color,
+            /* user: this.props.route.params.name,
+            background: this.props.route.params.color, */
         });
         
         // load the state of "name" in App.js as a prop into Chat component
@@ -64,8 +64,6 @@ export default class Chat extends React.Component {
     }
 
     render() {
-        
-
         return (
             <View style={styles.mainContainer}>
                 <GiftedChat
