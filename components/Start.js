@@ -14,7 +14,7 @@ export default class Start extends Component {
             <View style={styles.main}>
                 <ImageBackground source={require('./background.png')} resizeMode="cover" style={styles.background}>
                     <View style={styles.heading}>
-                        <Text style={styles.heading_text}>CHATastic</Text>
+                        <Text style={styles.heading_text}>CHATzam</Text>
                     </View>
                     <View style={styles.container}>
                         <TextInput

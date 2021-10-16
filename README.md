@@ -28,7 +28,7 @@ A chat app for mobile devices created in React Native: a chat interface as well 
     * React Native
     * Expo (inkl Expo Go for Android)
     * React-navigation library
-    * Google Firestore Database
+    * Google Cloud Firestore Database
     * Google Firebase authentication
     * Gifted Chat library
 
