@@ -35,7 +35,7 @@ export default class Chat extends React.Component {
             userName: ''
         };
 
-        /* // Initialize Firebase (if it hasn't already)
+        /* // Initialize Firebase (if it hasn't already) > DID NOT WORK HERE > MOVED TO BEFORE THE CLASS DEFINITION
         if (!firebase.apps.length) {
             // const app = initializeApp(firebaseConfig);
             firebase.initializeApp(firebaseConfig);
@@ -62,7 +62,7 @@ export default class Chat extends React.Component {
                 },
                 {
                     _id: 0,
-                    text: `Welcome to the chat ${this.props.route.params.name}.`,
+                    text: `Welcome to the chat ${this.state.userName}.`,
                     createdAt: new Date(),
                     system: true,
                 },
@@ -102,12 +102,12 @@ export default class Chat extends React.Component {
 
             // send a welcome message to the user after login
             const welcomeMessage = {
-                text: "Welcome new user", // `Welcome to the chat ${this.state.userName}.`
+                text: "Welcome to the chat " + this.state.userName,
                 createdAt: new Date(),
                 system: true,
-                _id: 0
+                // _id: 0
             }
-            this.onSend(welcomeMessage);            
+            this.onSend(welcomeMessage);      
         });
 
         // Create reference to the active users messages
@@ -154,7 +154,7 @@ export default class Chat extends React.Component {
         querySnapshot.forEach((doc) => {
             // get the QueryDocumentSnapshot's data
             var data = doc.data();
-            // messages.push({data});
+            // messages.push({data}); // creates two children with same key 'undefined'
             messages.push({
                 _id: data._id,
                 text: data.text, // || ''
@@ -167,7 +167,7 @@ export default class Chat extends React.Component {
             });            
         });
         this.setState({
-            messages,
+            messages
         });
     };
 
