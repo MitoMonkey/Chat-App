@@ -47,8 +47,8 @@ export default class Chat extends React.Component {
     }
     
     componentDidMount() {
-        // initialize with a mock message and a system message
         this.setState({
+            // initialize with a mock message and a system message
             /* messages: [
                 {
                     _id: 1,
@@ -67,6 +67,7 @@ export default class Chat extends React.Component {
                     system: true,
                 },
             ], */
+            // load name and color from props into the state
             userName: this.props.route.params.name,
             background: this.props.route.params.color,
         });
@@ -75,14 +76,6 @@ export default class Chat extends React.Component {
         // let { name, color } = this.props.route.params;
         // adjust the navigation bar (moved to App.js)
         // this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: color } });
-
-        //if (this.referenceChatMessages.length != 0) {
-            // “listen” for updates in the Firestore collection
-            this.unsubscribe = this.referenceChatMessages
-                .orderBy("createdAt", "desc")
-                .onSnapshot(this.onCollectionUpdate);
-        // }
-        // else { onSend('No messages found in database'); }
 
         // Anonymous user login
         this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
@@ -100,6 +93,17 @@ export default class Chat extends React.Component {
                 // messages: [],
             });
 
+            //if (this.referenceChatMessages.length != 0) {
+            // “listen” for updates in the Firestore collection
+            this.unsubscribe = this.referenceChatMessages
+                .orderBy("createdAt", "desc")
+                .onSnapshot(this.onCollectionUpdate);
+            // }
+            // else { onSend('No messages found in database'); }
+
+            // load messages from (local) asyncStorage
+            this.getMessages();
+
             // send a welcome message to the user after login
             const welcomeMessage = {
                 text: "Welcome to the chat " + this.state.userName,
@@ -108,7 +112,7 @@ export default class Chat extends React.Component {
                 _id: 0
             }
             // this.onSend(welcomeMessage);
-            this.referenceChatMessages.add(welcomeMessage);
+            // this.referenceChatMessages.add(welcomeMessage);
             /* this.setState(previousState => ({
                 messages: GiftedChat.append(previousState.messages, welcomeMessage),
             })); */
@@ -126,7 +130,41 @@ export default class Chat extends React.Component {
         this.authUnsubscribe();
     }
 
-    // Add new message to Firestore
+    // load messages from (local) asyncStorage
+    async getMessages() {
+        let messages = '';
+        try {
+            messages = await AsyncStorage.getItem('messages') || [];
+            this.setState({
+                messages: JSON.parse(messages)
+            });
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
+
+    // safe messages to (local) asyncStorage for offline usage
+    async saveMessages() {
+        try {
+            await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+    // delete messages from (local) asyncStorage
+    async deleteMessages() {
+        try {
+            await AsyncStorage.removeItem('messages');
+            this.setState({
+                messages: []
+            })
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+    // Add new message to Firestore > NOT NECESSARY AS IT CAN BE DONE IN ONE LINE; SEE onSend
     /* addMessage() {
         const message = this.state.messages[0];
         this.referenceChatMessages.add({
@@ -145,7 +183,10 @@ export default class Chat extends React.Component {
         // add the new message(s) to the state
         this.setState(previousState => ({
             messages: GiftedChat.append(previousState.messages, messages),
-        }));
+        }), () => {
+            // callback that saves the current state into asyncStorage
+            this.saveMessages();
+        });
                     
         // add the message to Firestore
         this.referenceChatMessages.add(messages[0]);
@@ -153,12 +194,16 @@ export default class Chat extends React.Component {
 
     onCollectionUpdate = (querySnapshot) => {
         // querySnapshot = all the data currently in the collection
+
+        // conditional to avoid refreshes if the only new message was sent from the user himself
+        // if (querySnapshot.length != this.state.messages.length) { 
+
         const messages = [];
         // go through each document
         querySnapshot.forEach((doc) => {
             // get the QueryDocumentSnapshot's data
             var data = doc.data();
-            // messages.push({data}); // creates two children with same key 'undefined'
+            // messages.push({data}); // throws an error because creates two children with same key 'undefined'
             messages.push({
                 _id: data._id,
                 text: data.text, // || ''
