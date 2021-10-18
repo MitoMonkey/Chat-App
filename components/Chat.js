@@ -105,9 +105,13 @@ export default class Chat extends React.Component {
                 text: "Welcome to the chat " + this.state.userName,
                 createdAt: new Date(),
                 system: true,
-                // _id: 0
+                _id: 0
             }
-            this.onSend(welcomeMessage);      
+            // this.onSend(welcomeMessage);
+            this.referenceChatMessages.add(welcomeMessage);
+            /* this.setState(previousState => ({
+                messages: GiftedChat.append(previousState.messages, welcomeMessage),
+            })); */
         });
 
         // Create reference to the active users messages
@@ -144,7 +148,7 @@ export default class Chat extends React.Component {
         }));
                     
         // add the message to Firestore
-        this.referenceChatMessages.add({ messages });
+        this.referenceChatMessages.add(messages[0]);
     }
 
     onCollectionUpdate = (querySnapshot) => {
