@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView, Alert  } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat'
+
+// package to store data locally (for offline use of the app)
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 /* import firebase from 'firebase';
 import firestore from 'firebase'; */
-
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+// import { getAnalytics } from "firebase/analytics";
 const firebase = require('firebase');
 require('firebase/firestore');
 
@@ -18,6 +21,9 @@ const firebaseConfig = {
     appId: "1:629796788049:web:1ed1ada6a801fbc02e6570",
     measurementId: "G-E1QKHKWQC9"
 };
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
 export default class Chat extends React.Component {
     constructor() {
@@ -28,11 +34,13 @@ export default class Chat extends React.Component {
             loggedInText: "Please wait, you are getting logged in",
         };
 
-        // Initialize Firebase (if it hasn't already)
+        /* // Initialize Firebase (if it hasn't already)
         if (!firebase.apps.length) {
+            // const app = initializeApp(firebaseConfig);
             firebase.initializeApp(firebaseConfig);
             // const analytics = getAnalytics(app);
-        }
+        } */
+
         // create a reference to the messages collection        
         this.referenceChatMessages = firebase.firestore().collection("messages");
     }
@@ -92,18 +100,19 @@ export default class Chat extends React.Component {
             //update user state with currently active user data
             this.setState({
                 uid: user.uid,
-                loggedInText: 'Hello ' + user,
+                loggedInText: 'Hello ' + user.name + user.uid,
                 messages: [],
             });
+            alertMyText(loggedInText);
 
             // send a welcome message to the user after login
                 // this.onSend(this.state.loggedInText);
-            this.referenceChatMessages.add({
-                _id: 1,
-                text: `Welcome to the chat ${user}.`,
+            /* this.referenceChatMessages.add({
+                _id: 0,
+                text: 'Welcome to the chat.', // `Welcome to the chat ${user.name}.`
                 createdAt: new Date(),
                 system: true,
-            });
+            }); */
         });
     }
 
@@ -128,7 +137,7 @@ export default class Chat extends React.Component {
     } */
     onSend(messages = []) {
         // add the user id to the new message
-        messages = messages.append(`uid: ${this.state.uid}`);
+        messages = messages.append(`_id: ${this.state.uid}`);
 
         // append the new message(s) to the state
         this.setState(previousState => ({
@@ -183,9 +192,9 @@ export default class Chat extends React.Component {
                     renderBubble={this.renderBubble.bind(this)}
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
-                    user={{
+                    /* user={{
                         _id: 1,
-                    }}
+                    }} */
                 />
                 {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
                 // prevent the keyboard hiding the text input on older android devices
