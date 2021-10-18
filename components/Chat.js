@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView  } from 'react-native';
-import { GiftedChat, Bubble } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
 
 // package to store data locally (for offline use of the app)
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// NetInfo to find out if user is online or not
+import NetInfo from '@react-native-community/netinfo';
 
 /* import firebase from 'firebase';
 import firestore from 'firebase'; */
@@ -32,7 +35,8 @@ export default class Chat extends React.Component {
             messages: [],
             uid: 0,
             loggedInText: "Please wait, you are getting logged in",
-            userName: ''
+            userName: '',
+            isConnected: ''
         };
 
         /* // Initialize Firebase (if it hasn't already) > DID NOT WORK HERE > MOVED TO BEFORE THE CLASS DEFINITION
@@ -41,9 +45,6 @@ export default class Chat extends React.Component {
             firebase.initializeApp(firebaseConfig);
             // const analytics = getAnalytics(app);
         } */
-
-        // create a reference to the messages collection        
-        this.referenceChatMessages = firebase.firestore().collection("messages");
     }
     
     componentDidMount() {
@@ -77,57 +78,77 @@ export default class Chat extends React.Component {
         // adjust the navigation bar (moved to App.js)
         // this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: color } });
 
-        // Anonymous user login
-        this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-            // onAuthStateChanged() is an observer that’s called whenever the user's sign-in state changes and returns an unsubscribe() function
-            
-            // check whether the user is signed in. If not, create a new user
-            if (!user) {
-                await firebase.auth().signInAnonymously();
+        // check if user is online, then log in to Firebase, else load messages from local storage
+        NetInfo.fetch().then(connection => {
+            if (connection.isConnected) {
+                
+                this.setState({
+                    isConnected: true
+                });
+
+                // Anonymous user login
+                this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+                    // onAuthStateChanged() is an observer that’s called whenever the user's sign-in state changes and returns an unsubscribe() function
+                    
+                    // check whether the user is signed in. If not, create a new user
+                    if (!user) {
+                        await firebase.auth().signInAnonymously();
+                    }
+
+                    //update user state with currently active user data
+                    this.setState({
+                        uid: user.uid,
+                        loggedInText: 'Welcome to the chat', //+ user.uid
+                        // messages: [],
+                    });
+
+                    // create a reference to the messages collection        
+                    this.referenceChatMessages = firebase.firestore().collection("messages");
+
+                    //if (this.referenceChatMessages.length != 0) {
+                    // “listen” for updates in the Firestore collection
+                    this.unsubscribe = this.referenceChatMessages
+                        .orderBy("createdAt", "desc")
+                        .onSnapshot(this.onCollectionUpdate);
+                    // }
+                    // else { onSend('No messages found in database'); }
+
+                    // Create reference to the active users messages
+                    // this.referenceUserMessages = firebase.firestore().collection('messages').where('uid', '==', this.state.uid);
+
+                    // send a welcome message to the user after login
+                    const welcomeMessage = {
+                        text: "Welcome to the chat " + this.state.userName,
+                        createdAt: new Date(),
+                        system: true,
+                        _id: 0
+                    }
+                    // this.onSend(welcomeMessage);
+                    // this.referenceChatMessages.add(welcomeMessage);
+                    /* this.setState(previousState => ({
+                        messages: GiftedChat.append(previousState.messages, welcomeMessage),
+                    })); */
+                });
+            } else {
+                this.setState({
+                    isConnected: false
+                });
+
+                // load messages from (local) asyncStorage
+                this.getMessages();
             }
-
-            //update user state with currently active user data
-            this.setState({
-                uid: user.uid,
-                loggedInText: 'Welcome to the chat', //+ user.uid
-                // messages: [],
-            });
-
-            //if (this.referenceChatMessages.length != 0) {
-            // “listen” for updates in the Firestore collection
-            this.unsubscribe = this.referenceChatMessages
-                .orderBy("createdAt", "desc")
-                .onSnapshot(this.onCollectionUpdate);
-            // }
-            // else { onSend('No messages found in database'); }
-
-            // load messages from (local) asyncStorage
-            this.getMessages();
-
-            // send a welcome message to the user after login
-            const welcomeMessage = {
-                text: "Welcome to the chat " + this.state.userName,
-                createdAt: new Date(),
-                system: true,
-                _id: 0
-            }
-            // this.onSend(welcomeMessage);
-            // this.referenceChatMessages.add(welcomeMessage);
-            /* this.setState(previousState => ({
-                messages: GiftedChat.append(previousState.messages, welcomeMessage),
-            })); */
-        });
-
-        // Create reference to the active users messages
-        // this.referenceUserMessages = firebase.firestore().collection('messages').where('uid', '==', this.state.uid);
+        })  
     }
 
     componentWillUnmount() {
-        // unsubscribe from Firstore updates
-        this.unsubscribe();
+        if (this.state.isConnected == true) {
+            
+            // unsubscribe from Firstore updates
+            this.unsubscribe();
 
-        // logout user
-        this.authUnsubscribe();
+            // logout user
+            this.authUnsubscribe();
+        }
     }
 
     // load messages from (local) asyncStorage
@@ -234,11 +255,24 @@ export default class Chat extends React.Component {
         )
     }
 
+    // avoid new messages when user is offline
+    renderInputToolbar(props) {
+        if (this.state.isConnected == false) {
+        } else {
+            return (
+                <InputToolbar
+                    {...props}
+                />
+            );
+        }
+    }
+
     render() {
         return (
             <View style={styles.mainContainer}>
                 <GiftedChat
                     renderBubble={this.renderBubble.bind(this)}
+                    renderInputToolbar={this.renderInputToolbar.bind(this)}
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
                     user={{

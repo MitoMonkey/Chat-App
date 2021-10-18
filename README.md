@@ -32,6 +32,7 @@ A chat app for mobile devices created in React Native: a chat interface as well 
     * Google Firebase authentication
     * Gifted Chat library
     * async-storage (to display message history while offline)
+    * NetInfo (to find out if the user is online or not)
 
 ## Usage
 * `expo start`
