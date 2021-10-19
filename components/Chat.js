@@ -113,6 +113,9 @@ export default class Chat extends React.Component {
                         // messages: [],
                     });
 
+                    // save user data to local storage for offline user
+                    this.saveUserID();
+
                     // create a reference to the messages collection        
                     this.referenceChatMessages = firebase.firestore().collection("messages");
 
@@ -145,6 +148,9 @@ export default class Chat extends React.Component {
                     isConnected: false
                 });
 
+                // load user ID from local storage, so own messages are displayed on the right side
+                this.getUserID();
+
                 // load messages from (local) asyncStorage
                 this.getMessages();
             }
@@ -162,19 +168,59 @@ export default class Chat extends React.Component {
         }
     }
 
-    // load messages from (local) asyncStorage
-    async getMessages() {
-        let messages = '';
+    // safe user data to (local) asyncStorage for offline usage
+    async saveUserID() {
+        let user = { _id: this.state.uid }
+        // name: this.state.userName, 
         try {
-            messages = await AsyncStorage.getItem('messages') || [];
+            await AsyncStorage.setItem('user', JSON.stringify(user));
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+    // load user from (local) asyncStorage
+    async getUserID() {
+        let user = {};
+        try {
+            user = await AsyncStorage.getItem('user') || {};
             this.setState({
-                messages: JSON.parse(messages)
+                //userName: JSON.parse(user).name,
+                uid: JSON.parse(user)._id
             });
         } catch (error) {
             console.log(error.message);
         }
     };
+    // delete user from (local) asyncStorage
+    async deleteUserID() {
+        try {
+            await AsyncStorage.removeItem('user');
+            this.setState({
+                //userName: '',
+                uid: ''
+            })
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
 
+    // load messages from (local) asyncStorage
+    async getMessages() {
+        let messages = [];
+        try {
+            messages = await AsyncStorage.getItem('messages') || [];
+            this.setState({
+                messages: JSON.parse(messages)
+            });
+
+// TESTING WHY USER IS NOT RECOGNIZED WHEN OFFLINE
+            //this.onSend(messages[0].user.name);
+            //this.onSend(messages[0].user._id);
+
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
     // safe messages to (local) asyncStorage for offline usage
     async saveMessages() {
         try {
@@ -183,7 +229,6 @@ export default class Chat extends React.Component {
             console.log(error.message);
         }
     }
-
     // delete messages from (local) asyncStorage
     async deleteMessages() {
         try {
@@ -284,11 +329,12 @@ export default class Chat extends React.Component {
                 <GiftedChat
                     renderBubble={this.renderBubble.bind(this)}
                     renderInputToolbar={this.renderInputToolbar.bind(this)}
+                    renderUsernameOnMessage={true}
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
                     user={{
                         _id: this.state.uid,
-                        name: this.state.userName,
+                        name: this.props.route.params.name,
                     }}
                 />
                 {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null

@@ -109,10 +109,10 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         marginRight: 5,
         marginLeft: 5,
-        borderColor: 'black',
+        borderColor: 'red',
     },
     border: {
-        borderWidth: 3
+        borderWidth: 4
     },
     noBorder: {
         borderWidth: 0
