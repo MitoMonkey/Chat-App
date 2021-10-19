@@ -34,7 +34,7 @@ export default class ChatApp extends Component {
           <Stack.Screen
             name="Chat"
             component={Chat}
-            options={({ route }) => ({ title: route.params.name })} // set the name that the user enters on Start.js as the title for Chat.js
+            options={({ route }) => ({ title: route.params.name  })} // set the name that the user enters on Start.js as the title for Chat.js
           />
         </Stack.Navigator>
       </NavigationContainer>

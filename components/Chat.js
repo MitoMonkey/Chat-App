@@ -35,7 +35,8 @@ export default class Chat extends React.Component {
             messages: [],
             uid: 0,
             loggedInText: "Please wait, you are getting logged in",
-            userName: '',
+            userName: 'John Doe',
+            background: 'blue',
             isConnected: ''
         };
 
@@ -48,9 +49,19 @@ export default class Chat extends React.Component {
     }
     
     componentDidMount() {
-        this.setState({
-            // initialize with a mock message and a system message
-            /* messages: [
+        // load name and color from props into the state
+        this.props.route.params.name ? this.setState({ userName: this.props.route.params.name }) : this.setState({ userName: 'anonymous' })
+        this.props.route.params.color ? this.setState({ background: this.props.route.params.color }) : this.setState({ background: 'orange' })
+
+        // load the state of "name" and "color" from App.js as a prop into Chat component > MOVED TO App.js 
+        // let { name, color } = this.props.route.params;
+        // adjust the navigation bar
+        // this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: color } });
+        this.props.navigation.setOptions({ headerStyle: { backgroundColor: this.state.background } });
+
+        // initialize with a mock message and a system message
+        /* this.setState({
+            messages: [
                 {
                     _id: 1,
                     text: 'Hello developer',
@@ -67,16 +78,8 @@ export default class Chat extends React.Component {
                     createdAt: new Date(),
                     system: true,
                 },
-            ], */
-            // load name and color from props into the state
-            userName: this.props.route.params.name,
-            background: this.props.route.params.color,
-        });
-        
-        // load the state of "name" and "color" from App.js as a prop into Chat component
-        // let { name, color } = this.props.route.params;
-        // adjust the navigation bar (moved to App.js)
-        // this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: color } });
+            ],           
+        }); */
 
         // check if user is online, then log in to Firebase, else load messages from local storage
         NetInfo.fetch().then(connection => {
@@ -142,7 +145,7 @@ export default class Chat extends React.Component {
 
     componentWillUnmount() {
         if (this.state.isConnected == true) {
-            
+
             // unsubscribe from Firstore updates
             this.unsubscribe();
 
@@ -248,7 +251,7 @@ export default class Chat extends React.Component {
                 {...props}
                 wrapperStyle={{
                     right: { // modify the speach bubbles on the right side
-                        backgroundColor: this.props.route.params.color
+                        backgroundColor: this.state.background
                     }
                 }}
             />
@@ -289,8 +292,8 @@ export default class Chat extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    /* background: {
-        backgroundColor: color,
+    /* background: { // has to be in the render block because state (and props?) are not available outside the class definition
+        backgroundColor: this.state.background,
     } */
     mainContainer: {
         flex: 1,
