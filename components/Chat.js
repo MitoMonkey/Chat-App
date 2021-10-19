@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView  } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView, Image, Button  } from 'react-native';
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
 
 // package to store data locally (for offline use of the app)
@@ -7,6 +7,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // NetInfo to find out if user is online or not
 import NetInfo from '@react-native-community/netinfo';
+
+// modules to access camera and gallery
+import * as Permissions from 'expo-permissions';
+import * as ImagePicker from 'expo-image-picker';
 
 /* import firebase from 'firebase';
 import firestore from 'firebase'; */
@@ -37,7 +41,8 @@ export default class Chat extends React.Component {
             loggedInText: "Please wait, you are getting logged in",
             userName: 'John Doe',
             background: '',
-            isConnected: ''
+            isConnected: '',
+            image: null
         };
 
         /* // Initialize Firebase (if it hasn't already) > DID NOT WORK HERE > MOVED TO BEFORE THE CLASS DEFINITION
@@ -254,6 +259,8 @@ export default class Chat extends React.Component {
                 _id: data.user._id,
                 name: data.user.name,
             },
+            image: message.image || '',
+            location: message.location || null,
         });
     } */
     onSend(messages = []) {
@@ -263,10 +270,9 @@ export default class Chat extends React.Component {
         }), () => {
             // callback that saves the current state into asyncStorage
             this.saveMessages();
+            // add the message to Firestore
+            this.referenceChatMessages.add(messages[0]);
         });
-                    
-        // add the message to Firestore
-        this.referenceChatMessages.add(messages[0]);
     }
 
     onCollectionUpdate = (querySnapshot) => {
@@ -323,6 +329,23 @@ export default class Chat extends React.Component {
         }
     }
 
+    pickImage = async () => {
+        // ask user for permission to access gallery
+        const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+        if (status === 'granted') {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: 'Images', // 'Videos' , 'All'
+            }).catch(error => console.log(error));
+
+            if (!result.cancelled) { // result would be "cancelled" if the user did not choose a file
+                this.setState({
+                    image: result
+                });
+            }
+        }
+    }
+
     render() {
         return (
             <View style={styles.mainContainer}>
@@ -340,6 +363,16 @@ export default class Chat extends React.Component {
                 {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
                 // prevent the keyboard hiding the text input on older android devices
                 }
+                <Button
+                    title="Pick an image from the library"
+                    onPress={this.pickImage}
+                />
+                {this.state.image &&
+                <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />}
+                <Button
+                    title="Take a photo"
+                    onPress={this.takePhoto}
+                />
             </View>
         );
     };
