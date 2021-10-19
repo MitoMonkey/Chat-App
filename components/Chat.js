@@ -36,7 +36,7 @@ export default class Chat extends React.Component {
             uid: 0,
             loggedInText: "Please wait, you are getting logged in",
             userName: 'John Doe',
-            background: 'blue',
+            background: '',
             isConnected: ''
         };
 
@@ -50,14 +50,22 @@ export default class Chat extends React.Component {
     
     componentDidMount() {
         // load name and color from props into the state
-        this.props.route.params.name ? this.setState({ userName: this.props.route.params.name }) : this.setState({ userName: 'anonymous' })
-        this.props.route.params.color ? this.setState({ background: this.props.route.params.color }) : this.setState({ background: 'orange' })
+        if (this.props.route.params.name) {
+            this.setState({ userName: this.props.route.params.name })
+        } else { 
+            this.setState({ userName: 'anonymous' })
+        }
+        if (this.props.route.params.color) {
+            this.setState({ background: this.props.route.params.color })
+        } else {
+            this.setState({ background: 'orange' })
+        }
 
         // load the state of "name" and "color" from App.js as a prop into Chat component > MOVED TO App.js 
         // let { name, color } = this.props.route.params;
         // adjust the navigation bar
-        // this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: color } });
-        this.props.navigation.setOptions({ headerStyle: { backgroundColor: this.state.background } });
+        // this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: this.state.background } });
+        this.props.navigation.setOptions({ headerStyle: { backgroundColor: this.props.route.params.color } });
 
         // initialize with a mock message and a system message
         /* this.setState({

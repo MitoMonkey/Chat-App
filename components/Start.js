@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
         borderColor: 'black',
     },
     border: {
-        borderWidth: 2
+        borderWidth: 3
     },
     noBorder: {
         borderWidth: 0
