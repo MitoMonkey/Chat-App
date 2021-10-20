@@ -17,37 +17,37 @@ export default class Start extends Component {
                         <Text style={styles.heading_text}>CHATzam</Text>
                     </View>
                     <View style={styles.container}>
-                        <TextInput
-                            style={styles.textInput}
-                            onChangeText={(name) => this.setState({ name })}
-                            value={this.state.name}
-                            placeholder='Enter your name'
-                        />
-                        <View style={styles.colorContainer}>
-                            <Text style={styles.text}>Choose your background color</Text>
-                            <View style={styles.colorPicker}>
-                                {colors.map((col) => <Pressable 
-                                    style={[styles.color, {backgroundColor: col }, this.state.color === col ? styles.border : styles.noBorder]}
-                                    key={col}
-                                    onPress={() => { this.setState({ color: col }) }}
-                                    accessible={true}
-                                    accessibilityLabel={col}
-                                    accessibilityHint="Choose your background color."
-                                    accessibilityRole="button">
-                                    </Pressable>
-                                ) }                                
+                            <TextInput
+                                style={styles.textInput}
+                                onChangeText={(name) => this.setState({ name })}
+                                value={this.state.name}
+                                placeholder='Enter your name'
+                            />
+                            <View style={styles.colorContainer}>
+                                <Text style={styles.text}>Choose your background color</Text>
+                                <View style={styles.colorPicker}>
+                                    {colors.map((col) => <Pressable 
+                                        style={[styles.color, {backgroundColor: col }, this.state.color === col ? styles.border : styles.noBorder]}
+                                        key={col}
+                                        onPress={() => { this.setState({ color: col }) }}
+                                        accessible={true}
+                                        accessibilityLabel={col}
+                                        accessibilityHint="Choose your background color."
+                                        accessibilityRole="button">
+                                        </Pressable>
+                                    ) }                                
+                                </View>
                             </View>
-                        </View>
-                        <Button
-                            title="Start chatting"
-                            style={styles.button}
-                            accessible={true}
-                            accessibilityLabel="Start chatting"
-                            accessibilityHint="Navigate to the Chat screen."
-                            accessibilityRole="button"
-                            onPress={() => this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color })}
-                        />
-                    </View>
+                            <Button
+                                title="Start chatting"
+                                style={styles.button}
+                                accessible={true}
+                                accessibilityLabel="Start chatting"
+                                accessibilityHint="Navigate to the Chat screen."
+                                accessibilityRole="button"
+                                onPress={() => this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color })}
+                            />
+                    </View>                    
                 </ImageBackground>
             </View>
         )
@@ -61,9 +61,29 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
         width: '100%',
+        height: '100%',
         justifyContent: "space-between",
         alignItems: 'center',
     },
+    /* 
+    // Attempts to avoid handle hidden parts of the view on small screens
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.mainview}>
+    scrollContainer: {
+        flex: 1,
+        flexGrow: 1,
+        flexDirection: 'column',
+        justifyContent: "space-between",
+        width: '100%',
+        height: '100%',
+    },
+    mainview: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        justifyContent: "space-between",
+        alignItems: 'center',
+    }, */
     heading: {
         flex: 1,
         justifyContent: 'center',
@@ -81,7 +101,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         backgroundColor: 'white',
         margin: 30,
-        maxWidth: 400
+        maxWidth: 400,
+        minHeight: 200
     },
     textInput: {
         height: 45, 
@@ -117,22 +138,4 @@ const styles = StyleSheet.create({
     noBorder: {
         borderWidth: 0
     },
-/*     gray: {
-        backgroundColor: 'gray'
-    },
-    teal: {
-        backgroundColor: 'teal'
-    },
-    orange: {
-        backgroundColor: 'orange'
-    },
-    cyan: {
-        backgroundColor: 'cyan',
-        borderColor: 'black',
-        borderWidth: 1,
-    }, */
-    button: {
-        flex: 1,
-        width: '80%',
-    }
 });

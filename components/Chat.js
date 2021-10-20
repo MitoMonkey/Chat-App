@@ -267,8 +267,8 @@ export default class Chat extends React.Component {
         // add the new message(s) to the state
         this.setState(previousState => ({
             messages: GiftedChat.append(previousState.messages, messages),
-        }), () => {
-            // callback that saves the current state into asyncStorage
+        }), () => { // callback
+            // save the current state into asyncStorage
             this.saveMessages();
             // add the message to Firestore
             this.referenceChatMessages.add(messages[0]);
@@ -301,6 +301,8 @@ export default class Chat extends React.Component {
         this.setState({
             messages
         });
+        // save all messages into local storage as well
+        this.saveMessages();
     };
 
     //set the background color of the text bubbles
@@ -329,23 +331,6 @@ export default class Chat extends React.Component {
         }
     }
 
-    pickImage = async () => {
-        // ask user for permission to access gallery
-        const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
-        if (status === 'granted') {
-            let result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: 'Images', // 'Videos' , 'All'
-            }).catch(error => console.log(error));
-
-            if (!result.cancelled) { // result would be "cancelled" if the user did not choose a file
-                this.setState({
-                    image: result
-                });
-            }
-        }
-    }
-
     render() {
         return (
             <View style={styles.mainContainer}>
@@ -362,17 +347,7 @@ export default class Chat extends React.Component {
                 />
                 {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
                 // prevent the keyboard hiding the text input on older android devices
-                }
-                <Button
-                    title="Pick an image from the library"
-                    onPress={this.pickImage}
-                />
-                {this.state.image &&
-                <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />}
-                <Button
-                    title="Take a photo"
-                    onPress={this.takePhoto}
-                />
+                }                
             </View>
         );
     };
