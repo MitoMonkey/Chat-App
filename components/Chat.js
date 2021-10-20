@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView, Image, Button  } from 'react-native';
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
+import MapView from 'react-native-maps';
 
 // package to store data locally (for offline use of the app)
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,16 +9,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // NetInfo to find out if user is online or not
 import NetInfo from '@react-native-community/netinfo';
 
-// modules to access camera and gallery
-import * as Permissions from 'expo-permissions';
-import * as ImagePicker from 'expo-image-picker';
+// module to share pictures, audio and location
+import CustomActions from './CustomActions';
 
-/* import firebase from 'firebase';
-import firestore from 'firebase'; */
+import firebase from 'firebase';
+import firestore from 'firebase';
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
-const firebase = require('firebase');
-require('firebase/firestore');
+/* const firebase = require('firebase');
+require('firebase/firestore'); */
 
 const firebaseConfig = {
     apiKey: "AIzaSyD8XhCZkN1jev-tS9vVy8BoJYialaYz9tQ",
@@ -72,6 +72,13 @@ export default class Chat extends React.Component {
         // this.props.navigation.setOptions({ title: name, headerStyle: { backgroundColor: this.state.background } });
         this.props.navigation.setOptions({ headerStyle: { backgroundColor: this.props.route.params.color } });
 
+        //define title in navigation bar
+        /* static navigationOptions = ({ navigation }) => {
+                return {
+                    title: `${navigation.state.params.userName}'s Chat`,
+                };
+            }; */
+
         // initialize with a mock message and a system message
         /* this.setState({
             messages: [
@@ -92,6 +99,10 @@ export default class Chat extends React.Component {
                     system: true,
                 },
             ],           
+        }); */
+
+        /* NetInfo.addEventListener((state) => {
+            this.handleConnectivityChange(state);
         }); */
 
         // check if user is online, then log in to Firebase, else load messages from local storage
@@ -217,11 +228,6 @@ export default class Chat extends React.Component {
             this.setState({
                 messages: JSON.parse(messages)
             });
-
-// TESTING WHY USER IS NOT RECOGNIZED WHEN OFFLINE
-            //this.onSend(messages[0].user.name);
-            //this.onSend(messages[0].user._id);
-
         } catch (error) {
             console.log(error.message);
         }
@@ -246,23 +252,24 @@ export default class Chat extends React.Component {
         }
     }
 
-    // Add new message to Firestore > NOT NECESSARY AS IT CAN BE DONE IN ONE LINE; SEE onSend
+    // Add new message to Firestore > NOT NECESSARY AS IT CAN BE DONE IN ONE LINE; SEE onSend > MAY BE NEEDED FOR IMAGE OR LOCATION MESSAGES
     /* addMessage() {
         const message = this.state.messages[0];
         this.referenceChatMessages.add({
             _id: message._id,
-            uid: this.state.uid,
             createdAt: message.createdAt,
-            text: message.text, // || ''
-            // user: message.user,
-            user: {
+            text: message.text || '',
+            uid: this.state.uid,
+            user: message.user,
+            /* user: {
                 _id: data.user._id,
                 name: data.user.name,
-            },
-            image: message.image || '',
+            }, * /
+            image: message.image || null,
             location: message.location || null,
         });
     } */
+
     onSend(messages = []) {
         // add the new message(s) to the state
         this.setState(previousState => ({
@@ -289,13 +296,15 @@ export default class Chat extends React.Component {
             // messages.push({data}); // throws an error because creates two children with same key 'undefined'
             messages.push({
                 _id: data._id,
-                text: data.text, // || ''
+                text: data.text || '',
                 createdAt: data.createdAt.toDate(),
                 user: data.user,
                 /* user: {
                     _id: data.user._id,
                     name: data.user.name,
                 }, */
+                image: data.image || null,
+                location: data.location || null,
             });            
         });
         this.setState({
@@ -331,6 +340,35 @@ export default class Chat extends React.Component {
         }
     }
 
+    // add a "button" into the InputBar to enable uploading a picture, audio or share location
+    renderCustomActions = (props) => {
+        return <CustomActions {...props} />;
+    };
+
+    // custom view to render a map into a message bubble if the message contains a location
+    renderCustomView(props) {
+        const { currentMessage } = props;
+        if (currentMessage.location) {
+            return (
+                <MapView
+                    style={{
+                        width: 150,
+                        height: 100,
+                        borderRadius: 13,
+                        margin: 3
+                    }}
+                    region={{
+                        latitude: currentMessage.location.latitude,
+                        longitude: currentMessage.location.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }}
+                />
+            );
+        }
+        return null;
+    }
+
     render() {
         return (
             <View style={styles.mainContainer}>
@@ -344,6 +382,8 @@ export default class Chat extends React.Component {
                         _id: this.state.uid,
                         name: this.props.route.params.name,
                     }}
+                    renderActions={this.renderCustomActions}
+                    renderCustomView={this.renderCustomView}
                 />
                 {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
                 // prevent the keyboard hiding the text input on older android devices

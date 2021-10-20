@@ -30,6 +30,10 @@ export default class ChatApp extends Component {
           <Stack.Screen
             name="Start"
             component={Start}
+            navigationOptions= {{
+              //hide navigation bar on Start screen
+              headerShown: false,
+              }}
           />
           <Stack.Screen
             name="Chat"
