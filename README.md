@@ -4,15 +4,14 @@ A chat app for mobile devices created in React Native: a chat interface as well 
 
 ## Live Demo
 
-[Live Demo Link](https://MitoMonkey.github.io/meet)
+
 
 ![screenshot](./public/Screenshot.png)
 
 ## Key Features
-* A page where users can enter their name and choose a background color for the chat screen before joining the chat. 
-* A page displaying the conversation, as well as an input field and submit button.
-* The chat must provide users with two additional communication features: sending images and location data.
-* Data gets stored online and offline. 
+* On the Start screen the user can enter their name and choose a background color for the their message bubbles before joining the chat. 
+* On the Chat screen the user can see past messages, create and send new ones as well as share pictures from their gallery, take fotos or share their location.
+* Data gets stored online and offline, so message history is available while offline. (New messages can of course not be sent while offline.)
 
 ## User Stories 
 * As a new user, I want to be able to easily enter a chat room so I can quickly start talking to my friends and family.
@@ -24,18 +23,35 @@ A chat app for mobile devices created in React Native: a chat interface as well 
 ## Built With
 - Major languages: Javascript
 - Frameworks: React Native
+- Android Studio (for emulating the app on various devices)
 - Dependencies:
     * React Native
     * Expo (inkl Expo Go for Android)
-    * React-navigation library
     * Google Cloud Firestore Database
     * Google Firebase authentication
     * Gifted Chat library
+    * React-navigation library (to enable gesture navigation between screens)
+    * @expo/react-native-action-sheet (to display a menu for sharing fotos or location)
+    * expo-image-picker (for sharing pictures from the device gallery)
+    * expo-av (to record and play audio)
+    * expo-location (to share the users location)
+    * react-native-maps (to display a map when sharing location)
+    * expo-permissions (to require users permission to access gallery, camera or location)
     * async-storage (to display message history while offline)
     * NetInfo (to find out if the user is online or not)
 
 ## Usage
-* `expo start`
+Install dependencies: `npm install`
+
+Start Metro Server (=expo testing environment): `expo start` 
+From there you can run the app on your physical smartphone in the app Expo Go (which you need to install from the app store) or in a emulation created by Android Studio or iOS Simulator.
+On Android: Shake device to open developer tools
+
+The database used to store messages and pictures online is (Google Firestore)[https://console.firebase.google.com/]
+You need a collection called "messages" in which each message will be stored as separate document.
+The credentials to access the database need to be stored in the constructor of Chat.js, in a variable called `firebaseConfig`.
+Anonymous authentication is also implemented through Google Firebase. 
+Media files will also be stored in Firebase cloud storage.
 
 ## Author
 👤 **Mito.this**
