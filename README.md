@@ -4,9 +4,9 @@ A chat app for mobile devices created in React Native: a chat interface as well 
 
 ## Screenshots
 
-<img src="./assets/Screenshot1_StartScreen.jpg" width="300">
-![screenshot2: Chat screen](./assets/Screenshot2_ChatScreen.jpg | width=300)
-![screenshot3: Chat screen - action sheet](./assets/Screenshot3_ActionSheet.jpg | width=300)
+<img src="./assets/Screenshot1_StartScreen.jpg" width="300" style="display: inline;">
+<img src="./assets/Screenshot2_ChatScreen.jpg" width="300" style="display: inline;">
+<img src="./assets/Screenshot3_ActionSheet.jpg" width="300" style="display: inline;">
 
 ## Key Features
 * On the Start screen the user can enter their name and choose a background color for the their message bubbles before joining the chat. 
