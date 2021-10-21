@@ -115,7 +115,11 @@ export default class Chat extends React.Component {
                         text: "Welcome to the chat " + this.state.userName,
                         createdAt: new Date(),
                         _id: new Date(),
-                        system: true                        
+                        system: true,
+                        user: {
+                            name: 'bot',
+                            // _id: Math.floor(Math.random() * 1000)
+                        }                        
                     }
                     this.onSend([welcomeMessage]);
                 });

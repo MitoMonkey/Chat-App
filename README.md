@@ -45,7 +45,8 @@ Install dependencies: `npm install`
 
 Start Metro Server (=expo testing environment): `expo start` 
 From there you can run the app on your physical smartphone in the app Expo Go (which you need to install from the app store) or in a emulation created by Android Studio or iOS Simulator.
-On Android: Shake device to open developer tools
+On Android: Shake device to open developer tools.
+To stop the Metro Server (on Windows): Ctrl + C
 
 The database used to store messages and pictures online is (Google Firestore)[https://console.firebase.google.com/]
 You need a collection called "messages" in which each message will be stored as separate document.
