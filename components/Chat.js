@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView, Image, Button, LogBox  } from 'react-native';
-import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
-import MapView from 'react-native-maps';
+import { GiftedChat, Bubble, InputToolbar, SystemMessage } from 'react-native-gifted-chat'
+import MapView, {Marker} from 'react-native-maps';
 
 // package to store data locally (for offline use of the app)
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,18 +22,7 @@ import { initializeApp } from "firebase/app";
 /* const firebase = require('firebase');
 require('firebase/firestore'); */
 
-const firebaseConfig = {
-    apiKey: "AIzaSyD8XhCZkN1jev-tS9vVy8BoJYialaYz9tQ",
-    authDomain: "chatzam-aa2dd.firebaseapp.com",
-    projectId: "chatzam-aa2dd",
-    storageBucket: "chatzam-aa2dd.appspot.com",
-    messagingSenderId: "629796788049",
-    appId: "1:629796788049:web:1ed1ada6a801fbc02e6570",
-    measurementId: "G-E1QKHKWQC9"
-};
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+
 
 export default class Chat extends React.Component {
     constructor() {
@@ -41,12 +30,26 @@ export default class Chat extends React.Component {
         this.state = {
             messages: [],
             uid: 0,
-            loggedInText: "Please wait, you are getting logged in",
+            // loggedInText: "Please wait, you are getting logged in",
             userName: 'John Doe',
             background: '',
-            isConnected: '',
-            image: null
+            // image: null,
+            isConnected: ''
+            
         };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8XhCZkN1jev-tS9vVy8BoJYialaYz9tQ",
+            authDomain: "chatzam-aa2dd.firebaseapp.com",
+            projectId: "chatzam-aa2dd",
+            storageBucket: "chatzam-aa2dd.appspot.com",
+            messagingSenderId: "629796788049",
+            appId: "1:629796788049:web:1ed1ada6a801fbc02e6570",
+            measurementId: "G-E1QKHKWQC9"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
 
         /* // Initialize Firebase (if it hasn't already) > DID NOT WORK HERE > MOVED TO BEFORE THE CLASS DEFINITION
         if (!firebase.apps.length) {
@@ -104,9 +107,19 @@ export default class Chat extends React.Component {
             ],           
         }); */
 
-        /* NetInfo.addEventListener((state) => {
-            this.handleConnectivityChange(state);
-        }); */
+        // create a listener to network connection state
+        this.unsubscribeNetInfo = NetInfo.addEventListener((state) => {
+            //this.onConnectivityChange(state);
+            if (!state.isConnected) {
+                this.setState({
+                    isConnected: false
+                });
+            } else if (state.isConnected) {
+                this.setState({
+                    isConnected: true
+                });
+            }
+        });
 
         // check if user is online, then log in to Firebase, else load messages from local storage
         NetInfo.fetch().then(connection => {
@@ -128,7 +141,7 @@ export default class Chat extends React.Component {
                     //update user state with currently active user data
                     this.setState({
                         uid: user.uid,
-                        loggedInText: 'Welcome to the chat', //+ user.uid
+                        // loggedInText: 'Welcome to the chat', //+ user.uid
                         // messages: [],
                     });
 
@@ -153,10 +166,10 @@ export default class Chat extends React.Component {
                     const welcomeMessage = {
                         text: "Welcome to the chat " + this.state.userName,
                         createdAt: new Date(),
-                        system: true,
-                        _id: 0
+                        _id: new Date(),
+                        system: true                        
                     }
-                    // this.onSend(welcomeMessage);
+                    this.onSend([welcomeMessage]);
                     // this.referenceChatMessages.add(welcomeMessage);
                     /* this.setState(previousState => ({
                         messages: GiftedChat.append(previousState.messages, welcomeMessage),
@@ -172,20 +185,42 @@ export default class Chat extends React.Component {
 
                 // load messages from (local) asyncStorage
                 this.getMessages();
+
+                /* const offlineWelcomeMessage = {
+                    text: "Welcome to the chat " + this.state.userName + "You are currently offline, so you can not send new messages",
+                    createdAt: new Date(),
+                    //_id: 0,
+                    system: true
+                }
+                this.setState(previousState => ({
+                    messages: GiftedChat.append(previousState.messages, offlineWelcomeMessage),
+                })); */
             }
         })  
     }
 
     componentWillUnmount() {
         if (this.state.isConnected == true) {
-
             // unsubscribe from Firstore updates
             this.unsubscribe();
-
-            // logout user
+            // logout user from Firebase
             this.authUnsubscribe();
+            // stop listening to network status changes
+            this.unsubscribeNetInfo();
         }
     }
+
+/*     onConnectivityChange = (state) => {
+        if (!state.isConnected) {
+            this.setState({
+                isConnected: false
+            });
+        } else if (state.isConnected) {
+            this.setState({
+                isConnected: true
+            });
+        }
+    }; */
 
     // safe user data to (local) asyncStorage for offline usage
     async saveUserID() {
@@ -334,6 +369,9 @@ export default class Chat extends React.Component {
     // avoid new messages when user is offline
     renderInputToolbar(props) {
         if (this.state.isConnected == false) {
+            // <View style={styles.offlineInputWrapper}>
+                <Text style={styles.offlineInput}>You are currently offline.</Text>
+            // </View>
         } else {
             return (
                 <InputToolbar
@@ -358,7 +396,7 @@ export default class Chat extends React.Component {
                         width: 150,
                         height: 100,
                         borderRadius: 13,
-                        margin: 3
+                        margin: 4
                     }}
                     region={{
                         latitude: currentMessage.location.latitude,
@@ -366,7 +404,14 @@ export default class Chat extends React.Component {
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                     }}
-                />
+                >
+                    <Marker
+                        coordinate={{
+                            latitude: currentMessage.location.latitude,
+                            longitude: currentMessage.location.longitude,
+                        }}
+                    />
+                </MapView>
             );
         }
         return null;
@@ -379,6 +424,7 @@ export default class Chat extends React.Component {
                     renderBubble={this.renderBubble.bind(this)}
                     renderInputToolbar={this.renderInputToolbar.bind(this)}
                     renderUsernameOnMessage={true}
+                    scrollToBottom
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
                     user={{
@@ -402,5 +448,14 @@ const styles = StyleSheet.create({
     } */
     mainContainer: {
         flex: 1,
-    }
+    },
+    offlineInputWrapper: {
+        flex: 1,
+        justifyContent: 'center',
+        backgroundColor: 'red',
+    },
+    offlineInput: {
+        color: 'black',
+        textAlign: 'center',
+    },
 })
