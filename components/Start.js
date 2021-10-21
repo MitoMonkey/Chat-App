@@ -65,25 +65,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: 'center',
     },
-    /* 
-    // Attempts to avoid handle hidden parts of the view on small screens
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.mainview}>
-    scrollContainer: {
-        flex: 1,
-        flexGrow: 1,
-        flexDirection: 'column',
-        justifyContent: "space-between",
-        width: '100%',
-        height: '100%',
-    },
-    mainview: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        justifyContent: "space-between",
-        alignItems: 'center',
-    }, */
     heading: {
         flex: 1,
         justifyContent: 'center',

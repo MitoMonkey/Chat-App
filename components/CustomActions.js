@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-native';
-import PropTypes from 'prop-types';
+import { StyleSheet, Text, View, Button, TouchableOpacity } from 'react-native';
 import { useActionSheet } from '@expo/react-native-action-sheet'; // hook
 
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
 import { Audio } from "expo-av";
 import * as Location from 'expo-location';
-import MapView from 'react-native-maps';
 
 import firebase from 'firebase';
 import firestore from 'firebase';
@@ -24,7 +22,6 @@ export default function CustomActions(props) {
     const pickImage = async () => {
         try {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            // const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
 
             if (status === 'granted') {
                 let result = await ImagePicker.launchImageLibraryAsync({
@@ -33,8 +30,6 @@ export default function CustomActions(props) {
 
                 if (!result.cancelled) {
                     setImage(result);
-                    // console.log('foto chosen from gallery: ' + result.uri);
-                    // console.log('"result": ' + result);
                     const imageURI = await uploadImage(result.uri);
                     props.onSend({ image: imageURI });
                 }
@@ -46,16 +41,8 @@ export default function CustomActions(props) {
 
     const takePhoto = async () => {
         try {
-            // const statusLibrary = await ImagePicker.requestMediaLibraryPermissionsAsync().status;
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
-            /* let status;
-            (statusCamera === 'granted' && statusLibrary === 'granted') ? status = 'granted' : status = ''; */
-
-            /* const { status } = await Permissions.askAsync(
-            Permissions.MEDIA_LIBRARY,
-            Permissions.CAMERA
-            ); */
-
+            
             if (status === 'granted') {
                 let result = await ImagePicker.launchCameraAsync({
                     mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -63,8 +50,6 @@ export default function CustomActions(props) {
 
                 if (!result.cancelled) {
                     setImage(result);
-                    // console.log('foto taken and safed at: ' + result.uri);
-                    // console.log('camera "result": ' + result);
                     const imageURI = await uploadImage(result.uri);
                     props.onSend({ image: imageURI });
                 }
@@ -76,7 +61,7 @@ export default function CustomActions(props) {
 
     // ***** RECORD AUDIO *****
 
-    // from CF snack
+    // from CF expo-snack
     const recordAudio = async () => {
         try {
             await Permissions.askAsync(Permissions.AUDIO_RECORDING);
@@ -136,8 +121,22 @@ export default function CustomActions(props) {
         console.log('Recording stopped and stored at', uri);
         setRecordURI(uri);
     };
+    /* RENDER BLOCK FROM EXPERIMENTATION PROJECT
+    <View style={styles.container}>
+        {/* <Button
+            title="Record"
+            onPress={recordAudio}
+        /> * /}
+        <Button
+            title={recording ? 'Stop Recording' : 'Start Recording'}
+            onPress={recording ? stopRecording : startRecording}
+        />
+        <Text>{recordURI}</Text>
+        <Button title="Play Sound" onPress={playSound(recordURI)} />
+    </View >
+    */
 
-    // ***** AUDIO PLAYBACK *****
+    // ***** AUDIO PLAYBACK ***** > NOT WORKING YET
     async function playSound(audioURI) {
         /* 
         try {
@@ -171,7 +170,7 @@ export default function CustomActions(props) {
       // ***** SHARE LOCATION *****
     const getLocation = async () => {
         try {
-            const { status } = await Location.requestForegroundPermissionsAsync(); // Permissions.askAsync(Permissions.LOCATION);
+            const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setErrorMsg('Permission to access location was denied');
                 return;
@@ -205,27 +204,6 @@ export default function CustomActions(props) {
         const snapshot = await ref.put(blob);
         return await snapshot.ref.getDownloadURL();
     };
-    /* const uploadImageFetch = async (uri) => {
-        const blob = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                resolve(xhr.response);
-            };
-            xhr.onerror = function (e) {
-                console.log(e);
-                reject(new TypeError("Network request failed"));
-            };
-            xhr.responseType = "blob";
-            xhr.open("GET", uri, true);
-            xhr.send(null);
-        });
-        const imageNameBefore = uri.split("/");
-        const imageName = imageNameBefore[imageNameBefore.length - 1];
-        const ref = firebase.storage().ref().child(`images/${imageName}`);
-        const snapshot = await ref.put(blob);
-        blob.close();
-        return await snapshot.ref.getDownloadURL();
-    }; */
 
     const { showActionSheetWithOptions } = useActionSheet();
     const onActionPress = () => {
@@ -239,16 +217,12 @@ export default function CustomActions(props) {
             async (buttonIndex) => {
                 switch (buttonIndex) {
                     case 0:
-                        // console.log('user wants to pick an image');
                         return pickImage();
                     case 1:
-                        // console.log('user wants to take a photo');
                         return takePhoto();
                     case 2:
-                        // console.log('user wants to get their location');
                         return getLocation();
                     // default:
-                    // cancel button is not defined yet
                 }
             },
         );
@@ -271,21 +245,6 @@ export default function CustomActions(props) {
     );
 }
 
-/* RENDER BLOCK FROM EXPERIMENTATION PROJECT
-<View style={styles.container}>
-    {/* <Button
-        title="Record"
-        onPress={recordAudio}
-    /> * /}
-    <Button
-        title={recording ? 'Stop Recording' : 'Start Recording'}
-        onPress={recording ? stopRecording : startRecording}
-    />
-    <Text>{recordURI}</Text>
-    <Button title="Play Sound" onPress={playSound(recordURI)} />    
-</View >
-*/
-
 const styles = StyleSheet.create({
     container: {
         width: 26,
@@ -307,8 +266,3 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 });
-
-/* // make sure "actionSheet" prop is a function
-CustomActions.contextTypes = {
-    actionSheet: PropTypes.func,
-}; */

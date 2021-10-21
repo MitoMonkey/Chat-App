@@ -1,6 +1,4 @@
-// import { StatusBar } from 'expo-status-bar';
 import React, {Component} from 'react';
-// import { StyleSheet, Text, View } from 'react-native';
 
 import Start from './components/Start';
 import Chat from './components/Chat';
@@ -31,7 +29,7 @@ export default class ChatApp extends Component {
             name="Start"
             component={Start}
             navigationOptions= {{
-              //hide navigation bar on Start screen
+              // hide navigation bar on Start screen
               headerShown: false,
               }}
           />
