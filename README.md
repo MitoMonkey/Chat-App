@@ -2,8 +2,7 @@
 
 A chat app for mobile devices created in React Native: a chat interface as well as options to share images and the users location.
 
-## Live Demo
-
+## Screenshots
 
 
 ![screenshot](./public/Screenshot.png)
