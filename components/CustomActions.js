@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
+import { useActionSheet } from '@expo/react-native-action-sheet'; // hook
 
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
@@ -32,8 +33,8 @@ export default function CustomActions(props) {
 
                 if (!result.cancelled) {
                     setImage(result);
-                    console.log('foto chosen from gallery: ' + result.uri);
-                    console.log('"result": ' + result);
+                    // console.log('foto chosen from gallery: ' + result.uri);
+                    // console.log('"result": ' + result);
                     const imageURI = await uploadImage(result.uri);
                     props.onSend({ image: imageURI });
                 }
@@ -62,8 +63,8 @@ export default function CustomActions(props) {
 
                 if (!result.cancelled) {
                     setImage(result);
-                    console.log('foto taken and safed at: ' + result.uri);
-                    console.log('camera "result": ' + result);
+                    // console.log('foto taken and safed at: ' + result.uri);
+                    // console.log('camera "result": ' + result);
                     const imageURI = await uploadImage(result.uri);
                     props.onSend({ image: imageURI });
                 }
@@ -226,10 +227,11 @@ export default function CustomActions(props) {
         return await snapshot.ref.getDownloadURL();
     }; */
 
+    const { showActionSheetWithOptions } = useActionSheet();
     const onActionPress = () => {
         const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Cancel'];
         const cancelButtonIndex = options.length - 1;
-        this.context.actionSheet().showActionSheetWithOptions(
+        showActionSheetWithOptions(
             {
                 options,
                 cancelButtonIndex,
@@ -237,15 +239,16 @@ export default function CustomActions(props) {
             async (buttonIndex) => {
                 switch (buttonIndex) {
                     case 0:
-                        console.log('user wants to pick an image');
+                        // console.log('user wants to pick an image');
                         return pickImage();
                     case 1:
-                        console.log('user wants to take a photo');
+                        // console.log('user wants to take a photo');
                         return takePhoto();
                     case 2:
-                        console.log('user wants to get their location');
+                        // console.log('user wants to get their location');
                         return getLocation();
                     // default:
+                    // cancel button is not defined yet
                 }
             },
         );
@@ -270,16 +273,6 @@ export default function CustomActions(props) {
 
 /* RENDER BLOCK FROM EXPERIMENTATION PROJECT
 <View style={styles.container}>
-    <Button
-        title="Pick an image from the library"
-        onPress={pickImage}
-    />
-    <Button
-        title="Take a photo"
-        onPress={takePhoto}
-    />
-    {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200 }} />}
-
     {/* <Button
         title="Record"
         onPress={recordAudio}
@@ -289,22 +282,7 @@ export default function CustomActions(props) {
         onPress={recording ? stopRecording : startRecording}
     />
     <Text>{recordURI}</Text>
-    <Button title="Play Sound" onPress={playSound(recordURI)} />
-
-    <Button
-        title="Get my location"
-        onPress={getLocation}
-    />
-    {location && <MapView
-        style={{ width: 300, height: 200 }}
-        region={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-        }}
-    />
-    }
+    <Button title="Play Sound" onPress={playSound(recordURI)} />    
 </View >
 */
 
@@ -330,7 +308,7 @@ const styles = StyleSheet.create({
     },
 });
 
-// make sure "actionSheet" prop is a function
+/* // make sure "actionSheet" prop is a function
 CustomActions.contextTypes = {
     actionSheet: PropTypes.func,
-};
+}; */

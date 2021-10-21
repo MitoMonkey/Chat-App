@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView, Image, Button  } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Platform, KeyboardAvoidingView, Image, Button, LogBox  } from 'react-native';
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
 import MapView from 'react-native-maps';
 
@@ -11,6 +11,9 @@ import NetInfo from '@react-native-community/netinfo';
 
 // module to share pictures, audio and location
 import CustomActions from './CustomActions';
+
+// Disable timer alert in Expo console
+LogBox.ignoreLogs(['Setting a timer']);
 
 import firebase from 'firebase';
 import firestore from 'firebase';
