@@ -4,7 +4,7 @@ A chat app for mobile devices created in React Native: a chat interface as well 
 
 ## Screenshots
 
-<img src="./assets/Screenshot1_StartScreen.jpg" width="300" style="display: inline;">
+<img src="./assets/Screenshot1_StartScreen.jpg" width="300" style="display: inline-block;">
 <img src="./assets/Screenshot2_ChatScreen.jpg" width="300" style="display: inline;">
 <img src="./assets/Screenshot3_ActionSheet.jpg" width="300" style="display: inline;">
 
