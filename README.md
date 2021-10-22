@@ -12,6 +12,7 @@ A chat app for mobile devices created in React Native: a chat interface as well 
 * On the Start screen the user can enter their name and choose a background color for the their message bubbles before joining the chat. 
 * On the Chat screen the user can see past messages, create and send new ones as well as share pictures from their gallery, take fotos or share their location.
 * Data gets stored online and offline, so message history is available while offline. (New messages can of course not be sent while offline.)
+* Full accessibility (for screen readers etc.). 
 
 ## User Stories 
 * As a new user, I want to be able to easily enter a chat room so I can quickly start talking to my friends and family.
@@ -53,6 +54,19 @@ You need a collection called "messages" in which each message will be stored as 
 The credentials to access the database need to be stored in the constructor of Chat.js, in a variable called `firebaseConfig`.
 Anonymous authentication is also implemented through Google Firebase. 
 Media files will also be stored in Firebase cloud storage.
+
+## Hint
+Additional comments and code fragments can be found in the latest development branch [networkStatus](https://github.com/MitoMonkey/Chat-App/tree/networkStatus)
+
+## Things that could be improved
+* When user is offline, don't just hide the inputToolbar, but disable it and render ist text to be "you are currently offline" (or show a system message).
+* Allow users to create new draft messages while offline
+* Safe the color chosen in Start.js into each message, so that (also old) messages are always displayed with the correct color.
+* When openening the app while offline, skip the Start screen as a username and color are not important when not able to send messages anyway. (But make sure to display it as soon as network connection is established)
+* Make use of `user.avatars` in GiftedChat
+* While a foto is being uploaded display a "loader"
+* Functionality to record and send audio files (record function is already implemented, just not integrated)
+* Functionality to play audio files in messages (`renderBubble` should be good to add the “play audio” functionality to the message bubbles)
 
 ## Author
 👤 **Mito.this**

@@ -292,8 +292,8 @@ export default class Chat extends React.Component {
             return (
                 <MapView
                     style={{
-                        width: 150,
-                        height: 100,
+                        width: 200,
+                        height: 150,
                         borderRadius: 13,
                         margin: 4
                     }}
