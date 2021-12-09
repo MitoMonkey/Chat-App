@@ -50,11 +50,11 @@ From there you can run the app on your physical smartphone in the app Expo Go (w
 On Android: Shake device to open developer tools.
 To stop the Metro Server (on Windows): Ctrl + C
 
-The database used to store messages and pictures online is (Google Firestore)[https://console.firebase.google.com/]
-You need a collection called "messages" in which each message will be stored as separate document.
+The database used to store messages and media files online is (Google Firestore)[https://console.firebase.google.com/]
+You will need to set up your own database to use the repo. You need a collection called "messages" in which each message will be stored as separate document.
 The credentials to access the database need to be stored in the constructor of Chat.js, in a variable called `firebaseConfig`.
+
 Anonymous authentication is also implemented through Google Firebase. 
-Media files will also be stored in Firebase cloud storage.
 
 ## Hint
 Additional comments and code fragments can be found in the latest development branch [networkStatus](https://github.com/MitoMonkey/Chat-App/tree/networkStatus)
